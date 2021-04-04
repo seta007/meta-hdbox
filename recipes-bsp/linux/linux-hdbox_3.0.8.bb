@@ -19,12 +19,10 @@ SRC_URI = "https://raw.githubusercontent.com/OpenVisionE2/hdbox-files/master/lin
 	file://${OPENVISION_BASE}/meta-openvision/recipes-linux/kernel-patches/kernel-add-support-for-gcc${VISIONGCCVERSION}.patch \
 	file://timeconst_perl5.patch \
 	file://disable-arch.patch \
+	file://return_address.patch \
+	file://disable_hi_pm_sleep.patch \
+	file://bypass_ipv6_filter.patch \
 	"
-
-#file://0012-log2-give-up-on-gcc-constant-optimizations.patch
-#file://0013-cp1emu-do-not-use-bools-for-arithmetic.patch
-#file://0014-makefile-silence-packed-not-aligned-warn.patch
-#file://0015-fcrypt-fix-bitoperation-for-gcc.patch
 
 # By default, kernel.bbclass modifies package names to allow multiple kernels
 # to be installed in parallel. We revert this change and rprovide the versioned
@@ -39,6 +37,7 @@ DEPENDS = "virtual/${TARGET_PREFIX}gcc"
 KERNEL_CONFIG_COMMAND = "oe_runmake -C ${S} O=${B} oldconfig"
 
 S = "${WORKDIR}/linux-${PV}_hisilicon"
+B = "${WORKDIR}/build"
 
 export OS = "Linux"
 KERNEL_OBJECT_SUFFIX = "ko"
@@ -61,3 +60,7 @@ do_shared_workdir_prepend() {
 
 do_rm_work() {
 }
+
+export KCFLAGS = "-Wno-error \
+                  -Wno-implicit-function-declaration \
+                  "

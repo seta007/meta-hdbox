@@ -1,0 +1,60 @@
+diff -Naur linux-3.0.8_hisilicon/net/ipv4/tcp.c linux-3.0.8_hisilicon-PersianPrince/net/ipv4/tcp.c
+--- linux-3.0.8_hisilicon/net/ipv4/tcp.c	2016-11-25 20:50:10.000000000 +0330
++++ linux-3.0.8_hisilicon-PersianPrince/net/ipv4/tcp.c	2021-04-04 21:18:26.632144998 +0430
+@@ -3417,7 +3417,7 @@
+ 	return rt->dst.dev && (rt->dst.dev->flags & IFF_LOOPBACK);
+ }
+ 
+-#if defined(CONFIG_IPV6) || defined(CONFIG_IPV6_MODULE)
++#if defined(CONFIG_IPV6)
+ static int tcp_is_local6(struct net *net, struct in6_addr *addr) {
+ 	struct rt6_info *rt6 = rt6_lookup(net, addr, addr, 0, 0);
+ 	return rt6 && rt6->rt6i_dev && (rt6->rt6i_dev->flags & IFF_LOOPBACK);
+@@ -3474,7 +3474,7 @@
+ 					continue;
+ 			}
+ 
+-#if defined(CONFIG_IPV6) || defined(CONFIG_IPV6_MODULE)
++#if defined(CONFIG_IPV6)
+ 			if (family == AF_INET6) {
+ 				struct in6_addr *s6;
+ 				if (!inet->pinet6)
+@@ -3511,3 +3511,4 @@
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(tcp_nuke_addr);
+diff -Naur linux-3.0.8_hisilicon/net/netfilter/Makefile linux-3.0.8_hisilicon-PersianPrince/net/netfilter/Makefile
+--- linux-3.0.8_hisilicon/net/netfilter/Makefile	2016-11-25 20:50:10.000000000 +0330
++++ linux-3.0.8_hisilicon-PersianPrince/net/netfilter/Makefile	2021-04-04 20:17:13.230326872 +0430
+@@ -95,14 +95,14 @@
+ obj-$(CONFIG_NETFILTER_XT_MATCH_PHYSDEV) += xt_physdev.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_PKTTYPE) += xt_pkttype.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_POLICY) += xt_policy.o
+-obj-$(CONFIG_NETFILTER_XT_MATCH_QTAGUID) += xt_qtaguid_print.o xt_qtaguid.o
++#obj-$(CONFIG_NETFILTER_XT_MATCH_QTAGUID) += xt_qtaguid_print.o xt_qtaguid.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_QUOTA) += xt_quota.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_QUOTA2) += xt_quota2.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_RATEEST) += xt_rateest.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_REALM) += xt_realm.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_RECENT) += xt_recent.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_SCTP) += xt_sctp.o
+-obj-$(CONFIG_NETFILTER_XT_MATCH_SOCKET) += xt_socket.o
++#obj-$(CONFIG_NETFILTER_XT_MATCH_SOCKET) += xt_socket.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_STATE) += xt_state.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_STATISTIC) += xt_statistic.o
+ obj-$(CONFIG_NETFILTER_XT_MATCH_STRING) += xt_string.o
+diff -Naur linux-3.0.8_hisilicon/net/netfilter/xt_qtaguid.c linux-3.0.8_hisilicon-PersianPrince/net/netfilter/xt_qtaguid.c
+--- linux-3.0.8_hisilicon/net/netfilter/xt_qtaguid.c	2016-11-25 20:50:10.000000000 +0330
++++ linux-3.0.8_hisilicon-PersianPrince/net/netfilter/xt_qtaguid.c	2021-04-04 20:14:12.469553566 +0430
+@@ -26,6 +26,10 @@
+ #include <net/tcp.h>
+ #include <net/udp.h>
+ 
++#if defined(CONFIG_IP6_NF_IPTABLES) || defined(CONFIG_IP6_NF_IPTABLES_MODULE)
++#include <linux/netfilter_ipv6/ip6_tables.h>
++#endif
++
+ #include <linux/netfilter/xt_socket.h>
+ #include "xt_qtaguid_internal.h"
+ #include "xt_qtaguid_print.h"

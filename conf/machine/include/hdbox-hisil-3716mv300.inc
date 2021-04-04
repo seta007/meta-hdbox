@@ -4,9 +4,8 @@ KERNELVERSION = "3.0.8"
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
 
 TARGET_ARCH = "arm"
-DEFAULTTUNE = "armv5t-vfp"
-require conf/machine/include/arm/arch-armv5.inc
-require conf/machine/include/soc-family.inc
+DEFAULTTUNE = "cortexa7hf"
+require conf/machine/include/tune-cortexa7.inc
 
 SOC_FAMILY = "hisi3716mv300"
 HICHIPSET = "3716mv300"
@@ -28,11 +27,9 @@ ROOTFS_FILE = "rootfs.ubi"
 
 RCNAME = "hdbox"
 
-#Provider
 OLDEST_KERNEL = "${KERNELVERSION}"
 PREFERRED_PROVIDER_virtual/kernel = "linux-hdbox"
 PREFERRED_VERSION_linux-hdbox = "${KERNELVERSION}"
-PREFERRED_PROVIDER_virtual/gstreamer1.0-dvbmediasink = "gstreamer1.0-plugin-dvbmediasink"
 PREFERRED_PROVIDER_virtual/enigma2-mediaservice = "enigma2-plugin-systemplugins-servicehisilicon"
 
 DISTRO_FEATURES_remove += "x11 wayland directfb"
@@ -78,3 +75,9 @@ IMAGE_CMD_ubi_append = " \
 	rm -Rf hdbox; \
 	rm -Rf ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}; \
 	"
+
+IMAGE_CMD_prepend = "\
+	rm -Rf ${IMAGE_ROOTFS}/tmp/*; \
+	"
+
+#EXTRA_ALSA = "mv200"
