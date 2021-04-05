@@ -37,7 +37,6 @@ DEPENDS = "virtual/${TARGET_PREFIX}gcc"
 KERNEL_CONFIG_COMMAND = "oe_runmake -C ${S} O=${B} oldconfig"
 
 S = "${WORKDIR}/linux-${PV}_hisilicon"
-B = "${WORKDIR}/build"
 
 export OS = "Linux"
 KERNEL_OBJECT_SUFFIX = "ko"

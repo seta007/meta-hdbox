@@ -13,17 +13,14 @@ CHIPSET = "Hi3716Mv300"
 
 STB_PLATFORM = "hdboxhisi3716mv300"
 
-IMAGE_FSTYPES += "ubi"
-
-MKUBIFS_ARGS = "-m 4096 -e 253952 -c 2048"
-UBINIZE_ARGS = "-m 4096 -p 256KiB -s 4096"
+IMAGE_FSTYPES += "tar.bz2"
 
 CMDLINE ?= "console=ttyAMA0,115200n8"
 
 MTD_KERNEL = "mmcblk0p4"
 MTD_ROOTFS = "mmcblk0p9"
-KERNEL_FILE = "uImage"
-ROOTFS_FILE = "rootfs.ubi"
+KERNEL_FILE = "kernel.img"
+ROOTFS_FILE = "rootfs.tar.bz2"
 
 RCNAME = "hdbox"
 
@@ -35,8 +32,6 @@ PREFERRED_PROVIDER_virtual/enigma2-mediaservice = "enigma2-plugin-systemplugins-
 DISTRO_FEATURES_remove += "x11 wayland directfb"
 
 BOX_BRAND = "hdbox"
-
-IMAGEDIR ?= "hdbox/${MACHINE}"
 
 # E2 OSD settings
 EXTRA_OECONF_append_pn-enigma2 = " --with-alphablendingacceleration=always --with-blitaccelerationthreshold=250 --with-fillaccelerationthreshold=190000"
@@ -52,32 +47,24 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "\
 	${@bb.utils.contains("MACHINE_FEATURES", "hisil-recovery", "hdbox-recovery-${HICHIPSET}" , "", d)} \
 	"
 
-IMAGE_CMD_ubifs_prepend = " \
+IMAGE_CMD_tar_prepend = " \
 	rm -Rf ${IMAGE_ROOTFS}/tmp/*; \
-	"
-
-IMAGE_CMD_ubi_append = " \
-	mkdir -p ${IMGDEPLOYDIR}/hdbox/${IMAGEDIR}; \
-	cp -f ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.ubi ${IMGDEPLOYDIR}/hdbox/${IMAGEDIR}/${ROOTFS_FILE}; \
-	cp -f ${DEPLOY_DIR_IMAGE}/uImage ${IMGDEPLOYDIR}/hdbox/${IMAGEDIR}/${KERNEL_FILE}; \
-	cp -f ${IMGDEPLOYDIR}/recovery.img ${IMGDEPLOYDIR}/hdbox/${IMAGEDIR}/recovery.img; \
-	cp -f ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/part.img ${IMGDEPLOYDIR}/hdbox/part.img; \
-	cp -f ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${MACHINE}/fastboot.img ${IMGDEPLOYDIR}/hdbox/${IMAGEDIR}/fastboot.img; \
-	cp -f ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${MACHINE}/bootargs.img ${IMGDEPLOYDIR}/hdbox/${IMAGEDIR}/bootargs.img; \
-	cp -f ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${MACHINE}/logo.img ${IMGDEPLOYDIR}/hdbox/${IMAGEDIR}/logo.img; \
-	echo "${IMAGE_NAME}" > ${IMGDEPLOYDIR}/hdbox/imageversion; \
-	echo "https://forum.openvision.tech/app.php/donate" > ${IMGDEPLOYDIR}/hdbox/donate.txt; \
-	cd ${IMGDEPLOYDIR}/hdbox; \
+	cp -f ${DEPLOY_DIR_IMAGE}/zImage ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/${KERNEL_FILE}; \
+	echo "${IMAGE_NAME}" > ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/imageversion; \
+	echo "https://forum.openvision.tech/app.php/donate" > ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/donate.txt; \
+	cd ${IMAGE_ROOTFS}; \
+	tar -cvf ${DEPLOY_DIR_IMAGE}/rootfs.tar -C ${IMAGE_ROOTFS} .; \
+	mv -f ${DEPLOY_DIR_IMAGE}/rootfs.tar ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/rootfs.tar; \
+	bzip2 ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/rootfs.tar; \
+	cd ${DEPLOY_DIR_IMAGE}; \
+	rm -f ${DEPLOY_DIR_IMAGE}/*.zip; \
+	cd hdbox-partitions-${MACHINE}/${IMAGEDIR}; \
 	zip -r ../${IMAGE_NAME}_usb.zip *; \
 	cd ..; \
-	rm -f ${DEPLOY_DIR_IMAGE}/*.ubi; \
-	rm -f ${DEPLOY_DIR_IMAGE}/*.ubifs; \
-	rm -Rf hdbox; \
+	mv -f ${IMAGE_NAME}_usb.zip ..; \
+	cd ..; \
+	rm -f ${DEPLOY_DIR_IMAGE}/*.tar.bz2; \
 	rm -Rf ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}; \
-	"
-
-IMAGE_CMD_prepend = "\
-	rm -Rf ${IMAGE_ROOTFS}/tmp/*; \
 	"
 
 #EXTRA_ALSA = "mv200"
