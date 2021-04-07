@@ -7,11 +7,11 @@ TARGET_ARCH = "arm"
 DEFAULTTUNE = "cortexa7hf"
 require conf/machine/include/tune-cortexa7.inc
 
-SOC_FAMILY = "hisi3716mv300"
-HICHIPSET = "3716mv300"
-CHIPSET = "Hi3716Mv300"
+SOC_FAMILY = "hisi3716cv100"
+HICHIPSET = "3716cv100"
+CHIPSET = "Hi3716Cv100"
 
-STB_PLATFORM = "hdboxhisi3716mv300"
+STB_PLATFORM = "hdboxhisi3716cv100"
 
 IMAGE_FSTYPES += "tar.bz2"
 
@@ -39,7 +39,7 @@ EXTRA_OECONF_append_pn-enigma2 = " --with-alphablendingacceleration=always --wit
 # Gstreamer dvbmediasink
 DVBMEDIASINK_CONFIG = "--with-wma --with-wmv --with-pcm --with-dts --with-eac3 --with-h265 --with-vb6 --with-vb8 -with-spark"
 
-MACHINE_FEATURES += "alsa usbhost switchoff osdposition hdmicec no-opengl hisil hisil-3716mv300 blindscan-tbs HDMI RCA 7segment textlcd ci hisil-recovery"
+MACHINE_FEATURES += "alsa usbhost switchoff osdposition hdmicec no-opengl hisil hisil-3716cv100 blindscan-tbs HDMI RCA 7segment textlcd ci hisil-recovery"
 
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "\
 	hdbox-dvb-modules-${MACHINE} \
