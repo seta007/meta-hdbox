@@ -42,19 +42,25 @@ export OS = "Linux"
 KERNEL_OBJECT_SUFFIX = "ko"
 KERNEL_IMAGEDEST = "tmp"
 KERNEL_IMAGETYPE = "zImage"
-KERNEL_OUTPUT = "zImage"
+KERNEL_OUTPUT = "arch/${ARCH}/boot/${KERNEL_IMAGETYPE}"
+
+FILES_${KERNEL_PACKAGE_NAME}-image = "/${KERNEL_IMAGEDEST}/zImage"
 
 do_configure_prepend() {
 	oe_runmake -C ${S} clean mrproper
 }
 
 kernel_do_install_append() {
-	install -d ${D}/${KERNEL_IMAGEDEST}
-	install -m 0755 ${KERNEL_OUTPUT_DIR}/${KERNEL_OUTPUT} ${D}/${KERNEL_IMAGEDEST}
+        install -d ${D}/${KERNEL_IMAGEDEST}
+        install -m 0755 ${KERNEL_OUTPUT} ${D}/${KERNEL_IMAGEDEST}
 }
 
-do_shared_workdir_prepend() {
-	mkdir -p ${B}/include/generated/
+kernel_do_compile() {
+        unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
+        oe_runmake ${KERNEL_IMAGETYPE_FOR_MAKE} ${KERNEL_ALT_IMAGETYPE} CC="${KERNEL_CC}" LD="${KERNEL_LD}"
+        if test "${KERNEL_IMAGETYPE_FOR_MAKE}.gz" = "${KERNEL_IMAGETYPE}"; then
+                gzip -9c < "${KERNEL_IMAGETYPE_FOR_MAKE}" > "${KERNEL_OUTPUT}"
+        fi
 }
 
 do_rm_work() {
@@ -63,3 +69,9 @@ do_rm_work() {
 export KCFLAGS = "-Wno-error \
                   -Wno-implicit-function-declaration \
                   "
+
+pkg_postrm_${KERNEL_PACKAGE_NAME}-image () {
+}
+
+# extra tasks
+addtask kernel_link_images after do_compile before do_install
