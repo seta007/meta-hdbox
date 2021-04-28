@@ -1,0 +1,40 @@
+diff -Naur linux-3.0.8_hisilicon/arch/arm/mach-godbox/hi_pm_sleep.S linux-3.0.8_PersianPrince/arch/arm/mach-godbox/hi_pm_sleep.S
+--- linux-3.0.8_hisilicon/arch/arm/mach-godbox/hi_pm_sleep.S	2016-11-25 20:50:09.000000000 +0330
++++ linux-3.0.8_PersianPrince/arch/arm/mach-godbox/hi_pm_sleep.S	2021-04-28 13:23:50.351786664 +0430
+@@ -182,13 +182,13 @@
+ do_fpu_save:
+ 
+ 	@ Save configuration registers and enable.
+-	MRS	r10, FPEXC
++	VMRS	r10, FPEXC
+ 	STR	r10, [\rd], #4        @ Save the FPEXC
+ 
+ 	@ Enable FPU access to save/restore the other registers.
+ 	LDR	r2, =0x40000000
+-	MSR	FPEXC, r2
+-	MRS	r2, FPSCR
++	VMSR	FPEXC, r2
++	VMRS	r2, FPSCR
+ 	STR	r2, [\rd], #4         @ Save the FPSCR
+ 
+ 	@ Store the VFP-D16 registers.
+@@ -362,7 +362,7 @@
+ 
+ 	@ Enable FPU access to save/restore the rest of registers.
+ 	LDR	r2, =0x40000000
+-	MSR	FPEXC, r2
++	VMSR	FPEXC, r2
+ 
+ 	@ Recover FPEXC and FPSCR. These will be restored later.
+ 	LDM	\rd!, {r9, r10}
+@@ -374,8 +374,8 @@
+ 	@ Restore configuration registers and enable.
+ 	@ Restore FPSCR _before_ FPEXC since FPEXC could
+ 	@ disable FPU and make setting FPSCR unpredictable.
+-	MSR	   FPSCR, r10
+-	MSR	   FPEXC, r9	@ Restore FPEXC after FPSCR
++	VMSR	   FPSCR, r10
++	VMSR	   FPEXC, r9	@ Restore FPEXC after FPSCR
+ 
+ exit_fpu_restore:
+ 

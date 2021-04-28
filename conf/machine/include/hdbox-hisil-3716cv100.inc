@@ -4,8 +4,8 @@ KERNELVERSION = "3.0.8"
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
 
 TARGET_ARCH = "arm"
-DEFAULTTUNE = "cortexa7hf"
-require conf/machine/include/tune-cortexa7.inc
+DEFAULTTUNE = "armv7a"
+require conf/machine/include/arm/arch-armv7a.inc
 
 SOC_FAMILY = "hisi3716cv100"
 HICHIPSET = "3716cv100"
@@ -29,6 +29,11 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-hdbox"
 PREFERRED_VERSION_linux-hdbox = "${KERNELVERSION}"
 PREFERRED_PROVIDER_virtual/enigma2-mediaservice = "enigma2-plugin-systemplugins-servicehisilicon"
 
+GCCVERSION_reborn = "4.9.4"
+GLIBCVERSION_reborn = "2.19"
+PREFERRED_VERSION_glibc_reborn = "2.19"
+PREFERRED_VERSION_glibc-initial_reborn = "2.19"
+
 DISTRO_FEATURES_remove += "x11 wayland directfb"
 
 BOX_BRAND = "hdbox"
@@ -47,11 +52,16 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "\
 	${@bb.utils.contains("MACHINE_FEATURES", "hisil-recovery", "hdbox-recovery-${HICHIPSET}" , "", d)} \
 	"
 
+do_image_tar[depends] += "u-boot-mkimage-native:do_populate_sysroot"
+
 IMAGE_CMD_tar_prepend = " \
 	rm -Rf ${IMAGE_ROOTFS}/tmp/*; \
-	cp -f ${DEPLOY_DIR_IMAGE}/zImage ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/${KERNEL_FILE}; \
-	echo "${IMAGE_NAME}" > ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/imageversion; \
-	echo "https://forum.openvision.tech/app.php/donate" > ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/donate.txt; \
+	cp -f ${DEPLOY_DIR_IMAGE}/zImage ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/zImage; \
+	cd ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}; \
+	mkimage -A arm -O linux -T kernel -C none -a 0x80800000 -e 0x80800000 -n e2kernel -d zImage ${KERNEL_FILE}; \
+	echo "${IMAGE_NAME}" > imageversion; \
+	echo "https://forum.openvision.tech/app.php/donate" > donate.txt; \
+	rm -f zImage; \
 	cd ${IMAGE_ROOTFS}; \
 	tar -cvf ${DEPLOY_DIR_IMAGE}/rootfs.tar -C ${IMAGE_ROOTFS} .; \
 	mv -f ${DEPLOY_DIR_IMAGE}/rootfs.tar ${DEPLOY_DIR_IMAGE}/hdbox-partitions-${MACHINE}/${IMAGEDIR}/rootfs.tar; \

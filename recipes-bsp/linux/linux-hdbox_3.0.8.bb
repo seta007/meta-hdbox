@@ -19,8 +19,7 @@ SRC_URI = "https://raw.githubusercontent.com/OpenVisionE2/hdbox-files/master/lin
 	file://${OPENVISION_BASE}/meta-openvision/recipes-linux/kernel-patches/kernel-add-support-for-gcc${VISIONGCCVERSION}.patch \
 	file://timeconst_perl5.patch \
 	file://disable-arch.patch \
-	file://return_address.patch \
-	file://disable_hi_pm_sleep.patch \
+	file://hi_pm_sleep_register.patch \
 	file://bypass_ipv6_filter.patch \
 	"
 
