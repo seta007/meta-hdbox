@@ -9,48 +9,29 @@ RDEPENDS_${PN} += "libjpeg-turbo"
 
 PV = "${KV}-${SRCDATE}"
 
+KERNEL_VERSION = "${KV}_hisilicon"
+
 SRC_URI = "https://raw.githubusercontent.com/OpenVisionE2/hdbox-files/master/${MACHINE}-drivers-${SRCDATE}.zip"
 
 S = "${WORKDIR}"
 
 INHIBIT_PACKAGE_STRIP = "1"
 
-FILES_${PN} += "${sysconfdir}/modprobe.d ${sysconfdir}/modules-load.d ${nonarch_base_libdir}/modules/${KV}/extra"
+FILES_${PN} += "${sysconfdir}/modprobe.d ${sysconfdir}/modules-load.d ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra"
 
 do_install() {
-	install -d ${D}${nonarch_base_libdir}/modules/${KV}/extra
+	install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
 	install -d ${D}${sysconfdir}/modprobe.d
 	install -d ${D}${sysconfdir}/modules-load.d
-	install -m 0755 ${S}/*.ko ${D}${nonarch_base_libdir}/modules/${KV}/extra
+	install -m 0755 ${S}/*.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
 	install -m 0644 ${S}/modprobe.d/_${MACHINE}.conf ${D}${sysconfdir}/modprobe.d/
 	install -m 0644 ${S}/modules-load.d/_${MACHINE}.conf ${D}${sysconfdir}/modules-load.d/
-}
-
-pkg_prerm_${PN}() {
-	if [ "x$D" == "x" ]; then
-		if [ -f ${nonarch_base_libdir}/modules/${KV}/extra/hi_play.ko ] ; then
-			rm -f ${nonarch_base_libdir}/modules/${KV}/extra/hi_play.ko;
-		fi
-	fi
 }
 
 do_package_qa() {
 }
 
+# The driver is a set of binary libraries to install
+# there's nothing to configure or compile
 do_configure[noexec] = "1"
-
-# Generate a simplistic standard init script
-do_compile () {
-	cat > suspend << EOF
-#!/bin/sh
-
-runlevel=runlevel | cut -d' ' -f2
-
-if [ "\$runlevel" != "0" ] ; then
-	exit 0
-fi
-
-mount -t sysfs sys /sys
-
-EOF
-}
+do_compile[noexec] = "1"
