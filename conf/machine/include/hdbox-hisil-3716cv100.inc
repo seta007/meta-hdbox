@@ -30,6 +30,9 @@ PREFERRED_VERSION_linux-hdbox = "${KERNELVERSION}"
 PREFERRED_PROVIDER_virtual/enigma2-mediaservice = "enigma2-plugin-systemplugins-servicehisilicon"
 
 GCCVERSION_reborn = "4.9.4"
+GLIBCVERSION_reborn = "2.19"
+PREFERRED_VERSION_glibc_reborn = "2.19"
+PREFERRED_VERSION_glibc-initial_reborn = "2.19"
 
 DISTRO_FEATURES_remove += "x11 wayland directfb"
 
@@ -44,6 +47,8 @@ DVBMEDIASINK_CONFIG = "--with-wma --with-wmv --with-pcm --with-dts --with-eac3 -
 MACHINE_FEATURES += "alsa usbhost switchoff osdposition hdmicec no-opengl hisil hisil-3716cv100 blindscan-tbs HDMI RCA 7segment textlcd ci hisil-recovery"
 
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "\
+	binutils \
+	strace \
 	hdbox-dvb-modules-${MACHINE} \
 	${@bb.utils.contains("MACHINE_FEATURES", "hisil-${HICHIPSET}", "hdbox-libs-${HICHIPSET} hdbox-partitions-${HICHIPSET} hdbox-bootargs-${HICHIPSET} hdbox-bootlogo-${HICHIPSET} hdbox-fastboot-${HICHIPSET}" , "", d)} \
 	${@bb.utils.contains("MACHINE_FEATURES", "hisil-recovery", "hdbox-recovery-${HICHIPSET}" , "", d)} \
